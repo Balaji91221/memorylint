@@ -189,3 +189,7 @@ PYTHONPATH=src python -m memorylint evaluate --dataset evals/heldout.json
 The local source suite passed 44 tests with the optional YAML extra; a base install skips seven YAML tests. Current hosted results are in the CI badge above. Fixture replay results do not establish live-model accuracy.
 
 MIT licensed. See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md). Version 0.2.0 is a development release. Independent pilots and live-model quality evaluation remain separate steps.
+
+---
+
+Explore more of my work: [latest open-source tools](https://github.com/Balaji91221#latest-open-source-tools) · [recent projects](https://github.com/Balaji91221#recent-work).
