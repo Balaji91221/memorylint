@@ -1,251 +1,161 @@
-# MemoryLint
+<h1 align="center">MemoryLint</h1>
+<p align="center"><strong>Keep an assistant's repository memory aligned with the code.</strong></p>
+<p align="center">Check saved claims against source evidence. Review what changed. Apply only the correction you approve.</p>
 
-Evidence-backed repository-memory validation, dependency history, and reviewable
-corrections. Local release **0.2.0**; Python 3.10+, standard-library-only base runtime.
-The distribution name `memorylint-local` has not been published or reserved.
+<p align="center">
+  <a href="https://github.com/Balaji91221/memorylint/actions/workflows/ci.yml"><img src="https://github.com/Balaji91221/memorylint/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/python-3.10%2B-3776AB.svg" alt="Python 3.10 or newer">
+  <img src="https://img.shields.io/badge/interfaces-SDK%20%C2%B7%20CLI%20%C2%B7%20MCP-0F766E.svg" alt="Python SDK, CLI and MCP">
+</p>
+<p align="center">
+  <a href="#why-i-built-it">Why</a> · <a href="#quick-start">Quick start</a> · <a href="#usage">Usage</a> · <a href="#architecture">Architecture</a> · <a href="#docs">Docs</a>
+</p>
 
-MemoryLint checks three explicit claim types: package manager, declared Node
-runtime, and package.json script command. It never treats arbitrary prose as true,
-never executes repository scripts, and never silently changes memory. Optional
-LLM extraction produces labelled candidates that require review.
+![MemoryLint workflow: saved claims, repository evidence, findings and reviewed corrections](docs/assets/overview.svg)
 
-## Install and first scan
+MemoryLint is a Python library and local tool for engineers building persistent coding assistants. It checks explicit claims in Markdown against the repository's package manager, declared Node version, and scripts. Every finding includes source evidence, so an assistant or a person can decide what to do next.
+
+## Why I built it
+
+As an AI engineer, I want memory to carry evidence as well as instructions. A saved instruction can outlive the code that made it correct. I built MemoryLint to make that drift inspectable: deterministic checks for facts the repository can establish, an explanation for each finding, and a separate review step before an edit.
+
+### The problem → the solution
+
+| When this happens | MemoryLint helps by |
+|---|---|
+| `AGENTS.md` says “use npm,” but `package.json` declares pnpm | Flagging the saved claim and showing the declaration and source hash |
+| Memory says `jest`, but the test script is now `node --test` | Proposing a specific replacement that you can inspect as a diff |
+| `.nvmrc` and CI declare different Node versions | Reporting a conflict instead of choosing a source silently |
+| Evidence changes while a correction is being reviewed | Rejecting an outdated patch and requiring a fresh proposal |
+
+### What you get
+
+- **Evidence-backed checks** for three explicit claim types, with source paths, selectors and hashes.
+- **Consistent reads** from cached working-tree files or immutable Git commit blobs.
+- **Optional SQLite history** with claim dependencies, scan records and review decisions.
+- **Reviewable corrections** with hash checks, an explicit apply operation and an audit trail.
+- **SDK, CLI and read-only MCP** for a local workflow or integration into an assistant.
+
+## Quick start
+
+Requires Python 3.10+. The base runtime uses the standard library; no model account is needed. Install from source—`memorylint-local` is not published on PyPI.
 
 ```bash
 git clone https://github.com/Balaji91221/memorylint.git
 cd memorylint
 python3 -m venv .venv
-.venv/bin/python -m pip install .
-.venv/bin/memorylint scan --repo examples/demo
+source .venv/bin/activate
+python -m pip install .
+memorylint scan --repo examples/demo
 ```
 
-The fixture deliberately reports two stale claims and one valid claim, returning
-**exit 1**. Build dependencies are setuptools 61+ and wheel; the base runtime has
-no third-party dependencies. Ordinary YAML workflows use the optional CI extra
-described below. For an offline environment with build tools already present:
+On Windows, activate with `.venv\Scripts\activate`.
 
-```bash
-python3 -m pip wheel --no-build-isolation --no-deps --wheel-dir dist .
-python3 -m pip install --no-index --no-deps dist/memorylint_local-0.2.0-py3-none-any.whl
-```
+The authored demo deliberately has two stale claims. Expect:
 
-Source checkout execution: `PYTHONPATH=src python3 -m memorylint ...`. Windows uses
-`.venv\Scripts\memorylint.exe`; set `PYTHONPATH` using the local shell's syntax.
-
-## Explicit Markdown claims
-
-````markdown
-# Repository memory
-
-```memorylint
-{
-  "version": 1,
-  "claims": [
-    {
-      "id": "manager",
-      "kind": "package_manager",
-      "value": "npm",
-      "scope": ".",
-      "sources": ["package.json", "pnpm-lock.yaml"]
-    },
-    {
-      "id": "test-command",
-      "kind": "script",
-      "name": "test",
-      "value": "jest",
-      "sources": ["package.json"]
-    }
-  ]
-}
-```
-````
-
-All paths are relative to `--repo`, including when a claim sets `scope`.
-`scope: "apps/site"` requires paths such as `apps/site/package.json`. Claim IDs
-are unique across the scan. List every authoritative source explicitly; omitted
-sources cannot generate a conflict. Unrelated monorepo apps need separate claims.
-
-| Kind | Supported evidence | Comparison |
+| Claim | Result | Evidence points to |
 |---|---|---|
-| `package_manager` | package.json `packageManager`; npm/pnpm/yarn/bun lockfile presence | Manager name; lockfile contents are not validated |
-| `runtime` | package.json `engines.node`; `.nvmrc`; `.node-version`; literal setup-node steps in GitHub workflow JSON or optional YAML | Declared text, whitespace and numeric `v` prefix normalized |
-| `script` | package.json `scripts[name]` | Declared command; never executed |
+| `package-manager` | `stale_candidate` | `pnpm` |
+| `node-runtime` | `valid` | `22.0.0` |
+| `test-command` | `stale_candidate` | `node --test` |
 
-Different declarations remain a `conflict`, even when semver ranges could be
-compatible. Runtime checking does not check the installed interpreter or semver
-satisfaction. The dependency-free installation reads **JSON-compatible YAML**.
-To read ordinary GitHub Actions `.yml/.yaml` workflows, install the optional CI
-extra from this source directory:
+**Exit 1 is the expected result:** a claim needs review. Exit 0 means evaluated claims are valid; exit 2 means an unsupported or incomplete check. Scan commands do not change memory.
 
-```bash
-python3 -m pip install '.[ci]'
-```
+![MemoryLint CLI showing the authored demo's stale and valid claims](docs/assets/demo.png)
 
-This adds PyYAML 6.x. The strict parser accepts literal `actions/setup-node`
-`with.node-version` declarations, including quoted `'22'` and unquoted `20.10`,
-and preserves their exact spelling. It rejects duplicate mapping keys, explicit
-tags, anchors, aliases, merge keys, multiple documents, and excessive nesting.
-Expressions, matrix jobs, and `node-version-file` indirection remain unsupported.
-Without the extra, regular YAML yields an explicit unsupported result and install
-hint; JSON workflows still work. Every supported setup-node step is retained as
-evidence, so differing CI and manifest declarations remain visible.
+*Local fixture output from `examples/demo`; this is an inspection tool, not a live-model benchmark.*
 
-Reports include source hashes, selectors, short excerpts, source revision,
-memory fence location, a snapshot identifier, and a run identifier. Exit codes:
+## Usage
 
-- **0:** all evaluated claims are valid. Filtered scans may evaluate none; inspect skipped counts.
-- **1:** a stale candidate or conflicting declaration needs review.
-- **2:** unsupported claims, invalid input, missing evidence, incomplete reads, or infrastructure errors.
+### Call the Python SDK
 
-`complete` means the scan encountered no input/I/O errors; it is not a replacement
-for the exit code. Unknown claims never pass.
-
-## Snapshot consistency and Git
-
-```bash
-memorylint scan --repo /path/to/repo --memory AGENTS.md --memory docs/MEMORY.md
-memorylint scan --repo /path/to/repo --revision HEAD --format json
-memorylint check --repo /path/to/repo --changed-since HEAD~1
-```
-
-Working-tree reads are cached for the duration of a scan, bounded to 2 MiB/file,
-and re-read at completion; observed concurrent changes make the report incomplete.
-For an immutable, coherent snapshot use `--revision`: Git resolves the commit once
-and reads regular blobs directly. Snapshot symlinks and submodules are rejected.
-The root must be the Git top level for revision/filter modes. Git is optional for
-ordinary full scans.
-
-`--changed-since` reads the current working tree and filters by changed memory or
-evidence paths, including untracked and deleted files. It is not a historic scan,
-and cannot be combined with `--revision`.
-
-## SQLite history and dependency cache
-
-```bash
-memorylint scan --repo /path/to/repo --index /path/to/history.sqlite --format json
-memorylint history --index /path/to/history.sqlite --claim manager
-memorylint history --index /path/to/history.sqlite --reviews
-memorylint backup-index --index /path/to/history.sqlite --output /path/to/backup.sqlite
-```
-
-The index is created only when explicitly requested. It stores append-only scan,
-claim, evidence, and review records, plus a replaceable current dependency cache.
-An unchanged claim/evidence signature reuses its finding. Changed, deleted, or
-moved sources are checked again; failed scans do not replace a complete cache.
-A full indexed scan still reads/hashes dependencies and returns every finding, so
-its semantic output matches an unindexed full scan. `cached_claims` reports reuse.
-History is scoped by repository/memory set/revision internally; use separate index
-files if repository histories must be segregated.
-
-The current SQLite schema is 1. Unknown schemas are rejected without replacement.
-Backups use SQLite's backup API, refuse overwrite, and preserve the original.
-Future migrations must operate on a backup; no unneeded in-place migration is
-performed. Index files have restrictive permissions and may contain source excerpts.
-
-## Propose, review, explicitly apply
-
-Use a disposable copy of the demo to try mutation:
-
-```bash
-cp -R examples/demo /tmp/memorylint-review-demo
-memorylint propose --repo /tmp/memorylint-review-demo --claim package-manager --output /tmp/manager.patch.json
-# Read the JSON's unified diff and expected source hashes.
-memorylint apply --repo /tmp/memorylint-review-demo --patch /tmp/manager.patch.json --index /tmp/memorylint-history.sqlite
-```
-
-`propose` never changes memory and refuses ambiguous conflicts or claims without a
-replacement. An existing patch file is never overwritten. `apply` requires an
-explicit audit index, checks the memory hash and evidence hashes, revalidates the
-replacement, verifies the displayed diff, and changes only the selected JSON
-claim value. Other prose is preserved; that fence is pretty-printed.
-
-Concurrent changes cause a conflict. Cooperating MemoryLint writers are serialized
-by an exclusive repository lock; observed external changes are rejected immediately
-before replacement. A hostile writer racing the final OS rename is outside this
-optimistic protocol. Apply refuses symlinked or multiply linked memory targets.
-
-An audit entry is recorded as `prepared` before replacement and `applied` afterward.
-A crash between those records requires comparing the recorded new hash to the
-current file before deciding whether to re-propose. Never blindly replay a patch.
-A leftover `.memorylint-apply.lock` can be removed only after confirming that its
-writer is no longer running. `memorylint reject --patch ... --index ...` records a
-rejected review without touching memory. `--expected-hash` can additionally bind
-an apply request to the hash your interface displayed.
-
-## Optional extraction and evaluation
-
-```bash
-memorylint extract --repo examples/extraction --memory MEMORY.md --source package.json --response examples/extraction/response.json
-memorylint extract --repo examples/extraction --memory MEMORY.md --source package.json --provider-command python3 examples/extraction/provider.py
-memorylint evaluate --dataset evals/heldout.json
-```
-
-The first command replays a saved provider response. The second runs an explicitly
-configured provider bridge (the bundled example is also a fixture). Its stdin
-contains a versioned instruction, Markdown, allowed source contents, and limits;
-stdout must contain one JSON response. No shell interpolation is used. Replace
-its `complete()` function with your chosen model client; keep credentials in its
-environment, not in memory files. See [the provider contract](docs/api/provider.md).
-
-Input/output bytes, output-token reports, elapsed time, and cost reports are
-bounded and validated. The command process is terminated on timeout or oversized
-output; on POSIX its process group is cleaned up. The configured provider must
-reserve/enforce its cost budget before billing. MemoryLint cannot reverse remote
-charges or independently verify a provider's billing report.
-
-Candidates must quote actual memory text and reference only approved paths.
-They are labelled `review_required`; deterministic validators produce candidate
-findings. Nothing is accepted or patched automatically. Using an external provider
-sends exactly the selected Markdown and source contents to that configured process;
-any subsequent remote transfer is controlled by that provider.
-
-The held-out fixture set tests parsing, attribution, ambiguity, stale flags, scope,
-and scoring. Its replay precision/recall **is not a claim of live-model accuracy**.
-The SDK evaluator accepts `provider_factory` to run the same held-out labels against
-an actual model. External model validation is still required before that release claim.
-
-## Read-only MCP integration
-
-Configure your MCP client to launch:
-
-```bash
-memorylint serve --repo /absolute/repository --memory AGENTS.md
-```
-
-The process exposes `memorylint_scan` and `memorylint_explain({"claim_id":"manager"})`.
-Root and memory files are bound at startup; tool arguments cannot change them.
-There are no write, extraction, shell, or apply tools. Scans do not open an index
-or create files. stdio is newline-delimited JSON-RPC, with MCP initialization,
-tools/list, tools/call, notifications/initialized, and ping. Supported protocol
-versions: 2024-11-05, 2025-03-26, 2025-06-18, and 2025-11-25. This is a synchronous
-local server without HTTP transport or task/cancellation extensions. References:
-[MCP lifecycle](https://modelcontextprotocol.io/specification/2025-11-25/basic/lifecycle)
-and [MCP tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools).
-
-## Python SDK
+Run this from the repository root after installation:
 
 ```python
-from memorylint import scan_memory, propose_patch, apply_patch
+from memorylint import scan_memory, propose_patch
 
-result = scan_memory('/path/to/repo', ['AGENTS.md'], index_path='/tmp/history.sqlite')
-report = result.to_dict()  # report schema 2; Markdown claim schema remains 1
+result = scan_memory("examples/demo")
+for finding in result.findings:
+    print(finding.claim.id, finding.status, finding.proposed_value)
 
-patch = propose_patch('/path/to/repo', 'manager')
-print(patch.diff)          # present to the user first
-# Only after the caller explicitly chooses to apply:
-# apply_patch('/path/to/repo', patch, index_path='/tmp/history.sqlite')
+patch = propose_patch("examples/demo", "package-manager")
+print(patch.diff)  # Review the proposed npm → pnpm change; nothing is applied.
 ```
 
-## Verification and maintenance
+Your Markdown needs a `memorylint` JSON block. Ordinary prose is not automatically asserted as true. See the [claim format and source rules](docs/usage.md#explicit-markdown-claims), [SQLite history](docs/usage.md#sqlite-history-and-dependency-cache), and [review/apply workflow](docs/usage.md#propose-review-explicitly-apply).
+
+### Connect an MCP client
+
+Add this server entry to a client that accepts `mcpServers` configuration. Replace both absolute paths with your virtual environment and target repository:
+
+```json
+{
+  "mcpServers": {
+    "memorylint": {
+      "command": "/absolute/memorylint/.venv/bin/memorylint",
+      "args": ["serve", "--repo", "/absolute/target-repo", "--memory", "AGENTS.md"]
+    }
+  }
+}
+```
+
+Call `memorylint_scan` with `{}` or `memorylint_explain` with `{"claim_id":"package-manager"}`. The server fixes the repository and memory paths at startup. It exposes **read-only** checks; applying corrections stays an explicit CLI/SDK operation. [Protocol details →](docs/usage.md#read-only-mcp-integration)
+
+### Add optional capabilities
 
 ```bash
-PYTHONPATH=src python3 -m unittest discover -s tests -v
-PYTHONPATH=src python3 -m memorylint evaluate --dataset evals/heldout.json
+python -m pip install '.[ci]'  # PyYAML support for ordinary GitHub Actions YAML
 ```
 
-See [feature status](IMPLEMENTATION_STATUS.md), [the roadmap](PROJECT_PLAN.md),
-[contribution guidance](CONTRIBUTING.md), [security guidance](SECURITY.md), and
-[release notes](CHANGELOG.md). CI builds a wheel, installs it in a fresh environment,
-and runs tests and evaluation. CI configuration is delivered; remote CI and outside
-pilots have not run. No hosted service, general truth checker, vector database, or
-automatic memory rewrite is part of this local release.
+JSON-compatible workflows need no extra. An optional [extraction provider](docs/api/provider.md) can turn selected prose into review-required candidates. Deterministic validators still check the candidates; a model cannot authorize a memory edit.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    A[CLI / Python SDK / read-only MCP] --> B[Scan orchestration]
+    B --> C[Markdown claims]
+    B --> D[Repository or Git snapshot]
+    C --> E[Deterministic validators]
+    D --> E
+    E --> F[Findings and evidence]
+    F -. optional .-> G[(SQLite history)]
+    F --> H[Reviewable proposal]
+    H --> I[Explicit apply with hash checks]
+```
+
+| Component | Responsibility |
+|---|---|
+| [scanner.py](src/memorylint/scanner.py) | Coordinate parsing, evidence reads, validation and completeness |
+| [models.py](src/memorylint/models.py), [validators.py](src/memorylint/validators.py) | Keep claims, findings and deterministic comparison rules together |
+| [evidence.py](src/memorylint/evidence.py), [ci.py](src/memorylint/ci.py) | Enforce source boundaries and parse supported declarations |
+| [index.py](src/memorylint/index.py), [review.py](src/memorylint/review.py) | Own history, proposal validation and guarded application |
+| [mcp.py](src/memorylint/mcp.py), [extraction.py](src/memorylint/extraction.py) | Provide separate read-only tool and optional provider boundaries |
+
+[Read the HLD, LLD, contracts and design tradeoffs →](docs/architecture.md)
+
+### Deliberate boundaries
+
+MemoryLint checks declarations, not installed runtimes or semver compatibility. Missing evidence is unresolved; arbitrary prose is not a verified fact. Corrections use optimistic concurrency, so Git snapshots are preferable when a coherent historic view matters. No hosted memory service or background rewrite is included.
+
+## Docs
+
+| Learn or build | Start here |
+|---|---|
+| Install, scan, review, apply and integrate | [Usage guide](docs/usage.md) |
+| Understand component responsibilities and state | [Architecture](docs/architecture.md) |
+| Add an extraction provider | [Provider contract](docs/api/provider.md) |
+| Check implemented scope and evidence | [Implementation status](IMPLEMENTATION_STATUS.md) · [Original plan](PROJECT_PLAN.md) |
+| Contribute or report a vulnerability | [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) |
+
+Run the source checks from the repository root:
+
+```bash
+PYTHONPATH=src python -m unittest discover -s tests -v
+PYTHONPATH=src python -m memorylint evaluate --dataset evals/heldout.json
+```
+
+The local source suite passed 44 tests with the optional YAML extra; a base install skips seven YAML tests. Current hosted results are in the CI badge above. Fixture replay results do not establish live-model accuracy.
+
+MIT licensed. See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md). Version 0.2.0 is a development release with public source; PyPI publication and independent pilots remain separate steps.
