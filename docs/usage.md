@@ -249,7 +249,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 -m memorylint evaluate --dataset evals/heldout.json
 ```
 
-See [feature status](../IMPLEMENTATION_STATUS.md), [the roadmap](../PROJECT_PLAN.md),
+See [feature status](../IMPLEMENTATION_STATUS.md),
 [contribution guidance](../CONTRIBUTING.md), [security guidance](../SECURITY.md), and
 [release notes](../CHANGELOG.md). CI builds a wheel, installs it in a fresh environment,
 and runs tests and evaluation. See the [workflow history](https://github.com/Balaji91221/memorylint/actions/workflows/ci.yml)

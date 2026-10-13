@@ -2,10 +2,8 @@
 
 Status: accepted for the first local implementation, 2026-10-13.
 
-The original plan included SQLite dependencies, historical Git snapshots, and
-review/apply workflows. The first release establishes source-backed correctness
-before adding persistence or mutation. It implements roadmap phases 1–2 and a
-stateless subset of phase 3.
+The first release establishes source-backed correctness before adding SQLite
+dependency tracking, historical Git snapshots, or review/apply workflows.
 
 Alternatives considered:
 

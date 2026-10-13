@@ -2,7 +2,7 @@
 
 [README](../README.md) · [Usage](usage.md) · [Implementation status](../IMPLEMENTATION_STATUS.md)
 
-This document describes the implemented 0.2.0 system. It explains how responsibilities, contracts and failure states fit together; the [original project plan](../PROJECT_PLAN.md) records broader design proposals.
+This document describes the implemented 0.2.0 system. It explains how responsibilities, contracts and failure states fit together.
 
 ## Goal and system boundary
 

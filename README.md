@@ -176,7 +176,7 @@ MemoryLint checks declarations, not installed runtimes or semver compatibility. 
 | Install, scan, review, apply and integrate | [Usage guide](docs/usage.md) |
 | Understand component responsibilities and state | [Architecture](docs/architecture.md) |
 | Add an extraction provider | [Provider contract](docs/api/provider.md) |
-| Check implemented scope and evidence | [Implementation status](IMPLEMENTATION_STATUS.md) · [Original plan](PROJECT_PLAN.md) |
+| Check implemented scope and evidence | [Implementation status](IMPLEMENTATION_STATUS.md) |
 | Contribute or report a vulnerability | [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) |
 
 Run the source checks from the repository root:
