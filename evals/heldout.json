@@ -1,0 +1,264 @@
+{
+  "version": 1,
+  "name": "repository-claims-heldout-v1",
+  "split": "held-out",
+  "cases": [
+    {
+      "id": "heldout-manager-stale",
+      "markdown": "Our package manager is npm.",
+      "sources": {
+        "package.json": "{\"packageManager\":\"pnpm@9\"}"
+      },
+      "expected": [
+        {
+          "id": "claim",
+          "kind": "package_manager",
+          "value": "npm",
+          "sources": [
+            "package.json"
+          ],
+          "status": "stale_candidate"
+        }
+      ],
+      "replay": {
+        "version": 1,
+        "claims": [
+          {
+            "id": "claim",
+            "kind": "package_manager",
+            "value": "npm",
+            "sources": [
+              "package.json"
+            ],
+            "quote": "Our package manager is npm."
+          }
+        ],
+        "usage": {
+          "output_tokens": 50,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-runtime-current",
+      "markdown": "We declare Node 22.0.0.",
+      "sources": {
+        "package.json": "{\"engines\":{\"node\":\"22.0.0\"}}"
+      },
+      "expected": [
+        {
+          "id": "claim",
+          "kind": "runtime",
+          "value": "22.0.0",
+          "sources": [
+            "package.json"
+          ],
+          "status": "valid"
+        }
+      ],
+      "replay": {
+        "version": 1,
+        "claims": [
+          {
+            "id": "claim",
+            "kind": "runtime",
+            "value": "22.0.0",
+            "sources": [
+              "package.json"
+            ],
+            "quote": "We declare Node 22.0.0."
+          }
+        ],
+        "usage": {
+          "output_tokens": 50,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-script-renamed",
+      "markdown": "The test script runs jest.",
+      "sources": {
+        "package.json": "{\"scripts\":{\"test\":\"node --test\"}}"
+      },
+      "expected": [
+        {
+          "id": "claim",
+          "kind": "script",
+          "value": "jest",
+          "sources": [
+            "package.json"
+          ],
+          "name": "test",
+          "status": "stale_candidate"
+        }
+      ],
+      "replay": {
+        "version": 1,
+        "claims": [
+          {
+            "id": "claim",
+            "kind": "script",
+            "value": "jest",
+            "sources": [
+              "package.json"
+            ],
+            "quote": "The test script runs jest.",
+            "name": "test"
+          }
+        ],
+        "usage": {
+          "output_tokens": 50,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-ambiguous",
+      "markdown": "Perhaps npm or yarn will be used later.",
+      "sources": {
+        "package.json": "{\"packageManager\":\"pnpm@9\"}"
+      },
+      "expected": [],
+      "replay": {
+        "version": 1,
+        "claims": [],
+        "usage": {
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-personal-fact",
+      "markdown": "I prefer dark mode and spicy food.",
+      "sources": {
+        "package.json": "{}"
+      },
+      "expected": [],
+      "replay": {
+        "version": 1,
+        "claims": [],
+        "usage": {
+          "output_tokens": 0,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-scope",
+      "markdown": "The site uses yarn.",
+      "sources": {
+        "apps/site/package.json": "{\"packageManager\":\"yarn@4\"}"
+      },
+      "expected": [
+        {
+          "id": "claim",
+          "kind": "package_manager",
+          "value": "yarn",
+          "sources": [
+            "apps/site/package.json"
+          ],
+          "scope": "apps/site",
+          "status": "valid"
+        }
+      ],
+      "replay": {
+        "version": 1,
+        "claims": [
+          {
+            "id": "claim",
+            "kind": "package_manager",
+            "value": "yarn",
+            "sources": [
+              "apps/site/package.json"
+            ],
+            "quote": "The site uses yarn.",
+            "scope": "apps/site"
+          }
+        ],
+        "usage": {
+          "output_tokens": 50,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-runtime-conflict",
+      "markdown": "The runtime is 22.",
+      "sources": {
+        "package.json": "{\"engines\":{\"node\":\"22\"}}",
+        ".nvmrc": "20"
+      },
+      "expected": [
+        {
+          "id": "claim",
+          "kind": "runtime",
+          "value": "22",
+          "sources": [
+            "package.json",
+            ".nvmrc"
+          ],
+          "status": "conflict"
+        }
+      ],
+      "replay": {
+        "version": 1,
+        "claims": [
+          {
+            "id": "claim",
+            "kind": "runtime",
+            "value": "22",
+            "sources": [
+              "package.json",
+              ".nvmrc"
+            ],
+            "quote": "The runtime is 22."
+          }
+        ],
+        "usage": {
+          "output_tokens": 50,
+          "cost_usd": 0
+        }
+      }
+    },
+    {
+      "id": "heldout-script-deleted",
+      "markdown": "The build script runs tsc.",
+      "sources": {
+        "package.json": "{\"scripts\":{}}"
+      },
+      "expected": [
+        {
+          "id": "claim",
+          "kind": "script",
+          "value": "tsc",
+          "sources": [
+            "package.json"
+          ],
+          "name": "build",
+          "status": "stale_candidate"
+        }
+      ],
+      "replay": {
+        "version": 1,
+        "claims": [
+          {
+            "id": "claim",
+            "kind": "script",
+            "value": "tsc",
+            "sources": [
+              "package.json"
+            ],
+            "quote": "The build script runs tsc.",
+            "name": "build"
+          }
+        ],
+        "usage": {
+          "output_tokens": 50,
+          "cost_usd": 0
+        }
+      }
+    }
+  ]
+}

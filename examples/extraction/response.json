@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "claims": [
+    {
+      "id": "claim",
+      "kind": "package_manager",
+      "value": "npm",
+      "sources": [
+        "package.json"
+      ],
+      "quote": "Our package manager is npm."
+    }
+  ],
+  "usage": {
+    "output_tokens": 50,
+    "cost_usd": 0
+  }
+}

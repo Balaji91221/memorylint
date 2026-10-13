@@ -1,0 +1,6 @@
+include LICENSE README.md PROJECT_PLAN.md IMPLEMENTATION_STATUS.md CHANGELOG.md CONTRIBUTING.md SECURITY.md
+recursive-include examples *
+recursive-include evals *.json *.md
+recursive-include tests *.py
+recursive-include docs *.md
+prune **/__pycache__

@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+*.sqlite
+*.sqlite-journal
+.memorylint-apply.lock
+
+# Local credentials, machine metadata, and generated output
+.DS_Store
+.env
+.env.*
+!.env.example
+.pytest_cache/
+*.sqlite-wal
+*.sqlite-shm

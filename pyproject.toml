@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "memorylint-local"
+version = "0.2.0"
+description = "Evidence-backed checks for explicit repository memory claims"
+requires-python = ">=3.10"
+readme = "README.md"
+dependencies = []
+license = {file = "LICENSE"}
+
+[project.optional-dependencies]
+ci = ["PyYAML>=6,<7"]
+
+[project.scripts]
+memorylint = "memorylint.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
