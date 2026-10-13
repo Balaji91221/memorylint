@@ -43,11 +43,13 @@ Requires Python 3.10+. The base runtime uses the standard library; no model acco
 
 ### Install the package
 
+The PyPI distribution is `memorylint-ai`; the Python import and command remain `memorylint`.
+
 ```bash
-python -m pip install memorylint
+python -m pip install memorylint-ai
 memorylint --help
 # Optional: ordinary GitHub Actions YAML support
-python -m pip install 'memorylint[ci]'
+python -m pip install 'memorylint-ai[ci]'
 ```
 
 Try an installed CLI scan without cloning a repository:
@@ -133,7 +135,7 @@ Call `memorylint_scan` with `{}` or `memorylint_explain` with `{"claim_id":"pack
 ### Add optional capabilities
 
 ```bash
-python -m pip install 'memorylint[ci]'  # Ordinary GitHub Actions YAML support
+python -m pip install 'memorylint-ai[ci]'  # Ordinary GitHub Actions YAML support
 ```
 
 JSON-compatible workflows need no extra. An optional [extraction provider](docs/api/provider.md) can turn selected prose into review-required candidates. Deterministic validators still check the candidates; a model cannot authorize a memory edit.

@@ -8,17 +8,19 @@ MemoryLint checks explicit claims in Markdown against repository evidence: the p
 
 ## Install
 
+The PyPI distribution is `memorylint-ai`; the Python import and command remain `memorylint`.
+
 Requires Python 3.10+. The base runtime has no third-party dependencies or model-account requirement.
 
 ```bash
-python -m pip install memorylint
+python -m pip install memorylint-ai
 memorylint --help
 ```
 
 For ordinary GitHub Actions YAML parsing:
 
 ```bash
-python -m pip install 'memorylint[ci]'
+python -m pip install 'memorylint-ai[ci]'
 ```
 
 The extra installs PyYAML 6.x. JSON-compatible workflows work without it. Git is needed only for revision/filter operations.

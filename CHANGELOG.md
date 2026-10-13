@@ -8,10 +8,10 @@
 - Added optional structured extraction providers, budgets, and held-out replay scoring.
 - Added read-only MCP stdio scan/explain tools with startup-bound paths.
 - Added literal setup-node evidence from JSON-compatible GitHub workflows and an
-  optional strict PyYAML adapter for ordinary YAML (`pip install 'memorylint[ci]'`).
+  optional strict PyYAML adapter for ordinary YAML (`pip install 'memorylint-ai[ci]'`).
 - Report schema is now 2; Markdown claims, patch schema, and SQLite schema are 1.
 - Added installed-wheel checks and CI configuration.
-- Prepared public `memorylint` distributions with SPDX license metadata, a PyPI description and complete authored source-distribution fixtures/docs.
+- Prepared public `memorylint-ai` distributions with SPDX license metadata, a PyPI description and complete authored source-distribution fixtures/docs.
 
 ## 0.1.0 — local build
 

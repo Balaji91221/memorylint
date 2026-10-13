@@ -19,6 +19,6 @@ compatibility, and a copy-first migration test where an older stored format exis
 Leave held-out fixtures separate from examples; add new real sanitized evaluation
 cases before tuning a model integration to them. Replay metrics are not model scores.
 
-Use this repository's issues and pull requests for contributions. Distribution,
-import and CLI name are `memorylint`; registry uploads remain a maintainer action. The original
+Use this repository's issues and pull requests for contributions. The distribution is
+`memorylint-ai`; import and CLI remain `memorylint`; registry uploads remain a maintainer action. The original
 implementation is MIT licensed; reused dependencies must retain their own notices.

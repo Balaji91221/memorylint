@@ -1,7 +1,7 @@
 # Implementation status
 
 Development release **0.2.0**, implemented and locally verified 2026-10-13.
-The distribution, import and CLI name are `memorylint`. Public distribution
+The distribution is `memorylint-ai`; import and CLI remain `memorylint`. Public distribution
 artifacts use SPDX MIT metadata and include a PyPI-specific description.
 No hosted deployment, live-model quality result or outside pilot is claimed.
 
