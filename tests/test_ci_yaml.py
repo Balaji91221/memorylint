@@ -104,19 +104,23 @@ class OptionalCiDependencyTests(unittest.TestCase):
             dependency.assert_not_called()
 
     def test_base_package_works_without_site_packages(self):
-        # -S removes installed PyYAML and proves imports are lazy in a real process.
-        package_parent = str(Path(__import__("memorylint").__file__).resolve().parent.parent)
+        # Load only this package: adding its parent would restore all site-packages
+        # for an installed wheel, including the optional PyYAML being excluded.
+        package_init = str(Path(__import__("memorylint").__file__).resolve())
         code = "\n".join([
-            "import sys",
-            f"sys.path.insert(0, {package_parent!r})",
-            "import memorylint",
+            "import importlib.util, sys",
+            "assert importlib.util.find_spec('yaml') is None, 'PyYAML must be isolated'",
+            f"spec = importlib.util.spec_from_file_location('memorylint', {package_init!r})",
+            "memorylint = importlib.util.module_from_spec(spec)",
+            "sys.modules['memorylint'] = memorylint",
+            "spec.loader.exec_module(memorylint)",
             "from memorylint.ci import load_workflow",
             "assert load_workflow(b'{\"jobs\":{}}', 'ci.yml') == {'jobs': {}}",
             "try: load_workflow(b'jobs: {}', 'ci.yml')",
             "except ValueError as error: assert 'optional PyYAML' in str(error)",
             "else: raise AssertionError('unexpected YAML availability')",
         ])
-        result = subprocess.run([sys.executable, "-S", "-c", code], capture_output=True, text=True, timeout=10)
+        result = subprocess.run([sys.executable, "-I", "-S", "-c", code], capture_output=True, text=True, timeout=10)
         self.assertEqual(result.returncode, 0, result.stderr)
 
 
