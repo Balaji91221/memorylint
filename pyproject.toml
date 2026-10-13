@@ -1,15 +1,35 @@
 [build-system]
-requires = ["setuptools>=61", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "memorylint-local"
+name = "memorylint"
 version = "0.2.0"
 description = "Evidence-backed checks for explicit repository memory claims"
 requires-python = ">=3.10"
-readme = "README.md"
+readme = {file = "README_PYPI.md", content-type = "text/markdown"}
+license = "MIT"
+license-files = ["LICENSE"]
 dependencies = []
-license = {file = "LICENSE"}
+keywords = ["ai-agents", "memory", "repository", "lint", "mcp"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Testing",
+]
+
+[project.urls]
+Homepage = "https://github.com/Balaji91221/memorylint"
+Documentation = "https://github.com/Balaji91221/memorylint/blob/main/docs/usage.md"
+Repository = "https://github.com/Balaji91221/memorylint"
+Issues = "https://github.com/Balaji91221/memorylint/issues"
+Changelog = "https://github.com/Balaji91221/memorylint/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 ci = ["PyYAML>=6,<7"]

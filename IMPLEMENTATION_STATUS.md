@@ -1,9 +1,9 @@
 # Implementation status
 
-Local release **0.2.0**, implemented and verified 2026-10-13. GitHub source
-publication is separate from a PyPI release: no PyPI package, hosted deployment,
-remote CI run, external model evaluation, or outside pilot is claimed.
-Package/runtime code is MIT licensed; PyPI name/registry checks remain.
+Development release **0.2.0**, implemented and locally verified 2026-10-13.
+The distribution, import and CLI name are `memorylint`. Public distribution
+artifacts use SPDX MIT metadata and include a PyPI-specific description.
+No hosted deployment, live-model quality result or outside pilot is claimed.
 
 ## Plan feature matrix
 
@@ -20,7 +20,7 @@ Package/runtime code is MIT licensed; PyPI name/registry checks remain.
 | Held-out evaluation | Eight labeled replay cases; precision/recall and false-stale scorer | Offline score verified; real-model accuracy still unmeasured |
 | CLI + SDK | Scan/check, history, backup, propose/apply/reject, extract/evaluate, serve | Source and installed-wheel tests plus CLI workflow smoke |
 | MCP checker | Root-bound read-only stdio scan/explain; lifecycle and tool schemas | Actual stdio subprocess integration test; no write tool |
-| Operations/release files | CI config, contribution/security guide, changelog, MIT license, copy-first backups | Remote CI, PyPI publication, package naming and external pilots outstanding |
+| Operations/release files | CI config, contribution/security guide, changelog, MIT license, copy-first backups | Public distribution packaging prepared; hosted results linked below; external pilots remain separate |
 
 ## Verification
 
@@ -36,10 +36,11 @@ Package/runtime code is MIT licensed; PyPI name/registry checks remain.
 - Installed CLI smoke: scan/index → propose → apply → review history, plus the
   command-provider extraction bridge, passed in a disposable repository.
 - Demo retains two intentional stale claims and one valid claim before applying.
-- Packaging built using setuptools 65.5.0 / wheel 0.47.0; installed with
-  `--no-index --no-deps` in a fresh virtual environment.
+- The earlier local package used setuptools 65.5.0 / wheel 0.47.0. Public
+  distribution metadata now requires setuptools 77+ for SPDX license support;
+  releases must pass a fresh wheel/sdist build and isolated installation.
 - CI defines Python 3.10/3.13 on Linux/macOS, testing both the base install and the
-  optional CI adapter; remote jobs have not run here.
+  optional CI adapter. See [current hosted results](https://github.com/Balaji91221/memorylint/actions/workflows/ci.yml).
 
 Run these commands from this repository's root to repeat the source checks:
 
@@ -67,5 +68,5 @@ writes instructions. In-process custom providers must honor their deadline contr
 No hosted dashboard, vector database, personal-memory hosting, universal natural-
 language truth checker, or automatic background rewriting is implemented or in
 scope. User interviews, independent pilots, model-backed evals, hosted CI,
-registry-name checks, and a PyPI release require external follow-through.
-Publishing source on GitHub does not complete those gates.
+release artifact verification and independent pilots require separate evidence.
+Publishing a package does not complete those validation gates.

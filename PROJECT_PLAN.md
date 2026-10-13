@@ -2,7 +2,7 @@
 
 Evidence based validation of repository memory.
 
-**Status:** Local roadmap phases implemented in release 0.2.0; external validation and PyPI publication remain outstanding. See [current implementation status](IMPLEMENTATION_STATUS.md) and [usage instructions](README.md). This plan retains the broader proposed roadmap; deployment and production validation have not started. **Planning date:** 13 October 2026. Package names and interfaces below are illustrative and must be checked before publication.
+**Status:** Local roadmap phases implemented in release 0.2.0; external validation remains outstanding; public `memorylint` packaging is prepared. See [current implementation status](IMPLEMENTATION_STATUS.md) and [usage instructions](README.md). This plan retains the broader proposed roadmap; deployment and production validation have not started. **Planning date:** 13 October 2026. The original proposed interfaces below are historical; current commands and the `memorylint` distribution are documented in README.
 
 ## Goal and target users
 
@@ -79,7 +79,7 @@ When optional model calls are introduced, version prompts and output schemas, va
 
 ## Installation and integration design
 
-The following command names are proposed interfaces for this future project; they are not claims that published packages exist. Reserve a package name, select a license, and publish only after the clean-install gate passes.
+The following commands record the original interface proposal; use README for current commands. The public distribution is `memorylint`, with MIT licensing. Registry uploads require the release installation checks.
 
 ```text
 memorylint scan --memory AGENTS.md --repo .

@@ -39,7 +39,35 @@ As an AI engineer, I want memory to carry evidence as well as instructions. A sa
 
 ## Quick start
 
-Requires Python 3.10+. The base runtime uses the standard library; no model account is needed. Install from source—`memorylint-local` is not published on PyPI.
+Requires Python 3.10+. The base runtime uses the standard library; no model account is needed.
+
+### Install the package
+
+```bash
+python -m pip install memorylint
+memorylint --help
+# Optional: ordinary GitHub Actions YAML support
+python -m pip install 'memorylint[ci]'
+```
+
+Try an installed CLI scan without cloning a repository:
+
+````bash
+memory_demo="$(mktemp -d)"
+printf '%s\n' '{"packageManager":"pnpm@10.0.0"}' > "$memory_demo/package.json"
+cat > "$memory_demo/AGENTS.md" <<'EOF'
+```memorylint
+{"version":1,"claims":[{"id":"manager","kind":"package_manager","value":"npm","sources":["package.json"]}]}
+```
+EOF
+memorylint scan --repo "$memory_demo"
+````
+
+Expect `stale_candidate`, with `pnpm` as the proposed value, and exit 1. Use your own repository path and explicit claims for real checks. These shell snippets use bash/zsh.
+
+### Run the full source demo
+
+The repository includes fixtures, tests and development documentation. They are also included in the source distribution; the wheel installs the library and CLI.
 
 ```bash
 git clone https://github.com/Balaji91221/memorylint.git
@@ -105,7 +133,7 @@ Call `memorylint_scan` with `{}` or `memorylint_explain` with `{"claim_id":"pack
 ### Add optional capabilities
 
 ```bash
-python -m pip install '.[ci]'  # PyYAML support for ordinary GitHub Actions YAML
+python -m pip install 'memorylint[ci]'  # Ordinary GitHub Actions YAML support
 ```
 
 JSON-compatible workflows need no extra. An optional [extraction provider](docs/api/provider.md) can turn selected prose into review-required candidates. Deterministic validators still check the candidates; a model cannot authorize a memory edit.
@@ -158,4 +186,4 @@ PYTHONPATH=src python -m memorylint evaluate --dataset evals/heldout.json
 
 The local source suite passed 44 tests with the optional YAML extra; a base install skips seven YAML tests. Current hosted results are in the CI badge above. Fixture replay results do not establish live-model accuracy.
 
-MIT licensed. See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md). Version 0.2.0 is a development release with public source; PyPI publication and independent pilots remain separate steps.
+MIT licensed. See [LICENSE](LICENSE) and [CHANGELOG.md](CHANGELOG.md). Version 0.2.0 is a development release. Independent pilots and live-model quality evaluation remain separate steps.

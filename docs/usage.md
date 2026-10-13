@@ -6,7 +6,9 @@ Run commands from the repository root unless a command says otherwise.
 
 Evidence-backed repository-memory validation, dependency history, and reviewable
 corrections. Local release **0.2.0**; Python 3.10+, standard-library-only base runtime.
-The distribution name `memorylint-local` has not been published or reserved.
+Distribution, Python import and CLI name: `memorylint`. Install with
+`python -m pip install memorylint`; add `memorylint[ci]` for ordinary YAML support.
+The examples below use the source checkout or extracted source distribution.
 
 MemoryLint checks three explicit claim types: package manager, declared Node
 runtime, and package.json script command. It never treats arbitrary prose as true,
@@ -30,7 +32,7 @@ described below. For an offline environment with build tools already present:
 
 ```bash
 python3 -m pip wheel --no-build-isolation --no-deps --wheel-dir dist .
-python3 -m pip install --no-index --no-deps dist/memorylint_local-0.2.0-py3-none-any.whl
+python3 -m pip install --no-index --no-deps dist/memorylint-0.2.0-py3-none-any.whl
 ```
 
 Source checkout execution: `PYTHONPATH=src python3 -m memorylint ...`. Windows uses
@@ -82,7 +84,7 @@ To read ordinary GitHub Actions `.yml/.yaml` workflows, install the optional CI
 extra from this source directory:
 
 ```bash
-python3 -m pip install '.[ci]'
+python3 -m pip install 'memorylint[ci]'
 ```
 
 This adds PyYAML 6.x. The strict parser accepts literal `actions/setup-node`
